@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pypresence import Presence
 from yandex_music import Client
 from config import *
@@ -15,8 +17,9 @@ RPC.connect()
 
 # Inicalize Yandex Music API
 client = Client(TOKEN).init()
+start_time = datetime.now()
 
-# Work until the program doesnt stoped
+# Work until the program doesnt stopped
 while True:
     try:
         queues = client.queues_list()
@@ -27,24 +30,19 @@ while True:
         title = last_track.title
         track_link = f"https://music.yandex.ru/album/{last_track['albums'][0]['id']}/track/{last_track['id']}/"
         image_link = "https://" + last_track.cover_uri.replace("%%", "1000x1000")
-        btns = [
-            {
-                "label": "Слушать Трек",
-                "url": track_link
-            }
-        ]
+
+        timedelta = datetime.now() - start_time
 
         RPC.update(
-            details="Слушает: " + title,
-            state="Исполнитель: " + artists,
+            details='Слушает: ' + title,
+            state='Прошло: ' + ':'.join(str(timedelta).split('.')[:-1]),
             large_image=image_link,
+            large_text='Исполнитель: ' + artists,
             small_image='https://sun2.beeline-yaroslavl.userapi.com/s/v1/ig2/ayvI4btzEaAgH5885Sg0'
                         'OwZud3jH3daU2LzP8KfTFvv0yLNzd2RBPc1PBxPrQfrfdC_vreCXfBcYhO8TzFgwJdpK.jpg?'
-                        'size=2560x2560&quality=95&type=album',
-            large_text="Your Text Here",
-            small_text="Your Text Here",
-            buttons=btns
+                        'size=2560x2560&quality=95&type=album'
         )
+
     except:
         RPC.update(
             details='Поддерживаются только треки из плейлистов 😥',
@@ -52,4 +50,15 @@ while True:
             large_image='https://c.tenor.com/ZuIbNWpIN5MAAAAC/rias-gremory-high-school-dxd.gif'
         )
 
-    time.sleep(1)  # update the rpc status (in seconds), default: 1
+    time.sleep(0.5)  # update the rpc status (in seconds), default: 1
+
+"""
+buttons=btns
+btns = [
+    {
+        "label": "Слушать Трек",
+        "url": track_link
+    }
+]
+small_text=str(),
+"""
